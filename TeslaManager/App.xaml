@@ -1,0 +1,9 @@
+﻿<Application x:Class="TeslaManager.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="Views/TeslaManagerView.xaml">
+    <Application.Resources>
+        <vm:ViewModelLocator xmlns:vm="clr-namespace:TeslaManager.Locators"
+                             x:Key="Locator" />
+    </Application.Resources>
+</Application>

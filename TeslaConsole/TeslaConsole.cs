@@ -19,14 +19,14 @@ namespace TeslaConsole
         {
             TeslaClient client = new TeslaClient(true);
 
-            await client.LogIn("username", "password");
+            await client.LogInAsync("username", "password");
 
             Console.WriteLine("Logged In: " + client.IsLoggedIn.ToString());
             Console.WriteLine();
 
             if (client.IsLoggedIn)
             {
-                List<TeslaVehicle> cars = await client.LoadVehicles();
+                List<TeslaVehicle> cars = await client.LoadVehiclesAsync();
 
                 if (cars.Count == 0)
                 {

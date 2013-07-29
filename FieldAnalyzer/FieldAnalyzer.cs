@@ -33,7 +33,6 @@ namespace FieldAnalyzer
                 TeslaVehicle car = cars.FirstOrDefault();
 
                 bool showUnchanged = true;
-
                 WriteModifiedFields(await client.AnalyzeFieldsAsync<TeslaVehicle>(client.TESLA_SERVER, client.VEHICLES_PATH), showUnchanged);
                 WriteModifiedFields(await client.AnalyzeFieldsAsync<ChargeStateStatus>(client.TESLA_SERVER, string.Format(client.CHARGE_STATE_PATH, car.Id)), showUnchanged);
                 WriteModifiedFields(await client.AnalyzeFieldsAsync<ClimateStateStatus>(client.TESLA_SERVER, string.Format(client.CLIMATE_STATE_PATH, car.Id)), showUnchanged);

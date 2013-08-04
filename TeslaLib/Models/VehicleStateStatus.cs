@@ -35,7 +35,7 @@ namespace TeslaLib.Models
         [JsonProperty(PropertyName = "rt")]
         public bool IsRearTrunkOpen { get; set; }
 
-        [JsonProperty(PropertyName = "car_verson")]
+        [JsonProperty(PropertyName = "car_version")]
         public string CarVersion { get; set; }
 
         [JsonProperty(PropertyName = "locked")]

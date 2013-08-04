@@ -9,7 +9,9 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Authentication;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TeslaLib.Models;
@@ -1761,6 +1763,50 @@ namespace TeslaLib
         }
 
         #endregion
+
+        public async void StreamingTest(string email, TeslaVehicle car)
+        {
+            if (car.Tokens.Count == 0)
+            {
+                // RELOAD TOKENS
+                await WakeUpAsync(car);
+                List<TeslaVehicle> cars = await LoadVehiclesAsync();
+
+                car = cars.FirstOrDefault(c => c.Id == car.Id);
+            }
+
+            string strBasicAuthInfo = string.Format("{0}:{1}", email, car.Tokens[0]);
+            string values = "values=speed,odometer,soc,elevation,est_heading,est_lat,est_lng,power,shift_state,range,est_range";
+
+            //streamingClient.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(strBasicAuthInfo));
+            //streamingClient.OpenReadAsync(new Uri(Path.Combine(TESLA_STREAMING_SERVER, "stream", car.VehicleId.ToString(), "?" + values)),car);
+
+
+            HttpWebRequest request = HttpWebRequest.CreateHttp(new Uri(Path.Combine(TESLA_STREAMING_SERVER, "stream", car.VehicleId.ToString(), "?" + values)));
+            request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(strBasicAuthInfo));
+            request.Timeout = 12500; // a bit more than the expected 2 minute max long poll
+
+            HttpWebResponse response = (HttpWebResponse) await request.GetResponseAsync();
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                {
+                    string line = null;
+
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        Console.WriteLine(line);
+                    }
+                }
+            }
+            else if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                // NEED NEW TOKENS
+            }
+
+            StreamingTest(email, car);
+        }
 
         public void Dispose()
         {

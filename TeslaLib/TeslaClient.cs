@@ -1817,14 +1817,6 @@ namespace TeslaLib
             streamer.Setup(filePath, valuesToStream, tripName);
             streamer.BeforeStreaming();
 
-            AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) =>
-            {
-                if (streamer.NeedsToClose())
-                {
-                    streamer.AfterStreaming();
-                }
-            };
-
             while (!isStopStreaming)
             {
                 HttpWebRequest request = HttpWebRequest.CreateHttp(new Uri(Path.Combine(TESLA_STREAMING_SERVER, "stream", vehicle.VehicleId.ToString(), "?values=" + valuesToStream)));

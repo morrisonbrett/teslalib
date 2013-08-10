@@ -18,10 +18,13 @@ namespace TeslaLib.Streaming
             writer = new StreamWriter(filePath);
             writer.AutoFlush = true;
         }
-        
+
         public override void AfterStreaming()
         {
-            writer.Close();
+            if (NeedsToClose())
+            {
+                writer.Close();
+            }
         }
 
         public override void DataRecevied(string line)

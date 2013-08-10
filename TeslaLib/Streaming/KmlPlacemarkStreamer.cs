@@ -28,10 +28,13 @@ namespace TeslaLib.Streaming
 
         public override void AfterStreaming()
         {
-            writer.WriteLine("</Document>");
-            writer.WriteLine("</kml>");
+            if (NeedsToClose())
+            {
+                writer.WriteLine("</Document>");
+                writer.WriteLine("</kml>");
 
-            writer.Close();
+                writer.Close();
+            }
         }
 
         public override bool NeedsToClose()

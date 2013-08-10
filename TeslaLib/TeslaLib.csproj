@@ -59,6 +59,9 @@
     <Compile Include="Models\MobileEnabledStatus.cs" />
     <Compile Include="Models\ResultStatus.cs" />
     <Compile Include="Converters\UnixTimestampConverter.cs" />
+    <Compile Include="Streaming\AStreamer.cs" />
+    <Compile Include="Streaming\KmlPlacemarkStreamer.cs" />
+    <Compile Include="Streaming\PlainTextStreamer.cs" />
     <Compile Include="TeslaClient.cs" />
     <Compile Include="Models\TeslaVehicle.cs" />
     <Compile Include="TeslaWebClient.cs">

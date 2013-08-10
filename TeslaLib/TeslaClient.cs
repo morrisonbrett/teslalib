@@ -10,11 +10,13 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Security.Authentication;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TeslaLib.Models;
+using TeslaLib.Streaming;
 
 namespace TeslaLib
 {
@@ -228,6 +230,8 @@ namespace TeslaLib
 
         public bool IsLoggedIn { get; private set; }
 
+        public string Email { get; private set; }
+
         private TeslaWebClient webClient = new TeslaWebClient();
 
         public TeslaClient(bool isDebugMode = false)
@@ -400,6 +404,7 @@ namespace TeslaLib
                 else
                 {
                     IsLoggedIn = true;
+                    Email = username;
                 }
 
                 return true;
@@ -1062,6 +1067,7 @@ namespace TeslaLib
                 else
                 {
                     IsLoggedIn = true;
+                    Email = username;
                 }
 
                 return true;
@@ -1764,49 +1770,119 @@ namespace TeslaLib
 
         #endregion
 
-        public async void StreamingTest(string email, TeslaVehicle car)
+        public async void StreamingTest(TeslaVehicle vehicle, string outputDirectory, string tripName, int outputFormatMode,
+            string valuesToStream = null)
         {
-            if (car.Tokens.Count == 0)
+            if (valuesToStream == null)
             {
-                // RELOAD TOKENS
-                await WakeUpAsync(car);
-                List<TeslaVehicle> cars = await LoadVehiclesAsync();
-
-                car = cars.FirstOrDefault(c => c.Id == car.Id);
+                valuesToStream = "speed,odometer,soc,elevation,est_heading,est_lat,est_lng,power,shift_state,range,est_range";
             }
 
-            string strBasicAuthInfo = string.Format("{0}:{1}", email, car.Tokens[0]);
-            string values = "values=speed,odometer,soc,elevation,est_heading,est_lat,est_lng,power,shift_state,range,est_range";
-
-            //streamingClient.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(strBasicAuthInfo));
-            //streamingClient.OpenReadAsync(new Uri(Path.Combine(TESLA_STREAMING_SERVER, "stream", car.VehicleId.ToString(), "?" + values)),car);
-
-
-            HttpWebRequest request = HttpWebRequest.CreateHttp(new Uri(Path.Combine(TESLA_STREAMING_SERVER, "stream", car.VehicleId.ToString(), "?" + values)));
-            request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(strBasicAuthInfo));
-            request.Timeout = 12500; // a bit more than the expected 2 minute max long poll
-
-            HttpWebResponse response = (HttpWebResponse) await request.GetResponseAsync();
-
-            if (response.StatusCode == HttpStatusCode.OK)
+            if (vehicle.Tokens.Count == 0)
             {
-                using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-                {
-                    string line = null;
+                // RELOAD TOKENS
+                await WakeUpAsync(vehicle);
+                List<TeslaVehicle> cars = await LoadVehiclesAsync();
 
-                    while ((line = reader.ReadLine()) != null)
+                vehicle = cars.FirstOrDefault(c => c.Id == vehicle.Id);
+            }
+
+            string strBasicAuthInfo = string.Format("{0}:{1}", Email, vehicle.Tokens[0]);
+
+            bool isStopStreaming = false;
+
+            StreamingOutputFormat outputFormat = (StreamingOutputFormat)Enum.Parse(typeof(StreamingOutputFormat), outputFormatMode.ToString());
+
+
+            string extension = "txt";
+
+            switch (outputFormat)
+            {
+                case StreamingOutputFormat.PLAIN_TEXT:
+                    extension = "txt";
+                    break;
+                case StreamingOutputFormat.KML_PLACEMARK:
+                case StreamingOutputFormat.KML_PATH:
+                    extension = "kml";
+                    break;
+            }
+
+            // Find the Streamer using Reflection
+            Type t = GetTypeWithStreamingOutputAttribute(outputFormat);
+            AStreamer streamer = (AStreamer) Activator.CreateInstance(t);
+            
+            string filePath = Path.Combine(outputDirectory, string.Format("{0}_{1}.{2}", DateTime.Now.ToString("MM_dd_yyyy"), tripName, extension));
+
+
+            streamer.Setup(filePath, valuesToStream, tripName);
+            streamer.BeforeStreaming();
+
+            AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) =>
+            {
+                if (streamer.NeedsToClose())
+                {
+                    streamer.AfterStreaming();
+                }
+            };
+
+            while (!isStopStreaming)
+            {
+                HttpWebRequest request = HttpWebRequest.CreateHttp(new Uri(Path.Combine(TESLA_STREAMING_SERVER, "stream", vehicle.VehicleId.ToString(), "?values=" + valuesToStream)));
+                request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(strBasicAuthInfo));
+                request.Timeout = 12500; // a bit more than the expected 2 minute max long poll
+
+                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    using (StreamReader reader = new StreamReader(response.GetResponseStream()))
                     {
-                        Console.WriteLine(line);
+                        string line = null;
+
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            // DATA RECEIVED
+                            streamer.DataRecevied(line);
+                        }
+                    }
+                }
+                else if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    // RELOAD TOKENS
+                    await WakeUpAsync(vehicle);
+                    List<TeslaVehicle> cars = await LoadVehiclesAsync();
+
+                    vehicle = cars.FirstOrDefault(c => c.Id == vehicle.Id);
+                }
+                else
+                {
+                    isStopStreaming = true;
+                }
+            }
+
+            streamer.AfterStreaming();
+        }
+
+        private static Type GetTypeWithStreamingOutputAttribute(StreamingOutputFormat format)
+        {
+            Type attributeType = typeof(StreamingFormatAttribute);
+            
+            foreach (Type type in  Assembly.GetExecutingAssembly().GetTypes())
+            {
+                if (type.IsDefined(attributeType))
+                {
+                    StreamingFormatAttribute a = type.GetCustomAttribute<StreamingFormatAttribute>();
+                    
+                    if (a.OutputFormat == format)
+                    {
+                        return type;
                     }
                 }
             }
-            else if (response.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                // NEED NEW TOKENS
-            }
 
-            StreamingTest(email, car);
+            return null;
         }
+        
 
         public void Dispose()
         {

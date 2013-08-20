@@ -1,22 +1,13 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using TeslaLib.Converters;
 
 namespace TeslaLib.Models
 {
     public class DriveStateStatus
     {
-        public DriveStateStatus()
-        {
-
-        }
-
         [JsonProperty(PropertyName = "shift_state")]
         [JsonConverter(typeof(StringEnumConverter))]
         public ShiftState? ShiftState { get; set; }

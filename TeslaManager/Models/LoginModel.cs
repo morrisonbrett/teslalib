@@ -1,17 +1,10 @@
 ﻿using SimpleMvvmToolkit;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TeslaManager.Models
 {
     public class LoginModel : ModelBase<LoginModel>
     {
-
-
         #region Constructors
 
         public LoginModel()
@@ -24,28 +17,28 @@ namespace TeslaManager.Models
 
         #region Properties
 
-        private string email;
+        private string _email;
         [Required]
         [EmailAddress]
         public string Email
         {
-            get { return email; }
+            get { return _email; }
             set
             {
-                email = value;
+                _email = value;
                 NotifyPropertyChanged(m => m.Email);
                 ValidateProperty(m => m.Email, value);
             }
         }
 
-        private string password;
+        private string _password;
         [Required]
         public string Password
         {
-            get { return password; }
+            get { return _password; }
             set
             {
-                password = value;
+                _password = value;
                 NotifyPropertyChanged(m => m.Password);
                 ValidateProperty(m => m.Password, value);
             }

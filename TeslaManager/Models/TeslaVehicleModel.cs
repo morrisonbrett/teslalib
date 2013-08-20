@@ -1,11 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
+﻿using SimpleMvvmToolkit;
 using TeslaLib.Models;
 
-using SimpleMvvmToolkit;
-
-namespace TeslaManager
+namespace TeslaManager.Models
 {
     public class TeslaVehicleModel : ModelBase<TeslaVehicleModel>
     {
@@ -29,71 +25,70 @@ namespace TeslaManager
             IsRightRearDoorOpen = state.IsPassengerRearDoorOpen;
         }
 
-        private bool isFrunkOpen;
+        private bool _isFrunkOpen;
         public bool IsFrunkOpen
         {
-            get { return isFrunkOpen; }
+            get { return _isFrunkOpen; }
             set
             {
-                isFrunkOpen = value;
+                _isFrunkOpen = value;
                 NotifyPropertyChanged(m => m.IsFrunkOpen);
             }
         }
 
-        private bool isTrunkOpen;
+        private bool _isTrunkOpen;
         public bool IsTrunkOpen
         {
-            get { return isTrunkOpen; }
+            get { return _isTrunkOpen; }
             set
             {
-                isTrunkOpen = value;
+                _isTrunkOpen = value;
                 NotifyPropertyChanged(m => m.IsTrunkOpen);
             }
         }
 
-        private bool isLeftFrontDoorOpen;
+        private bool _isLeftFrontDoorOpen;
         public bool IsLeftFrontDoorOpen
         {
-            get { return isLeftFrontDoorOpen; }
+            get { return _isLeftFrontDoorOpen; }
             set
             {
-                isLeftFrontDoorOpen = value;
+                _isLeftFrontDoorOpen = value;
                 NotifyPropertyChanged(m => m.IsLeftFrontDoorOpen);
             }
         }
 
-        private bool isLeftRearDoorOpen;
+        private bool _isLeftRearDoorOpen;
         public bool IsLeftRearDoorOpen
         {
-            get { return isLeftRearDoorOpen; }
+            get { return _isLeftRearDoorOpen; }
             set
             {
-                isLeftRearDoorOpen = value;
+                _isLeftRearDoorOpen = value;
                 NotifyPropertyChanged(m => m.IsLeftRearDoorOpen);
             }
         }
 
-        private bool isRightFrontDoorOpen;
+        private bool _isRightFrontDoorOpen;
         public bool IsRightFrontDoorOpen
         {
-            get { return isRightFrontDoorOpen; }
+            get { return _isRightFrontDoorOpen; }
             set
             {
-                isRightFrontDoorOpen = value;
+                _isRightFrontDoorOpen = value;
                 NotifyPropertyChanged(m => m.IsRightFrontDoorOpen);
             }
         }
 
-        private bool isRightRearDoorOpen;
+        private bool _isRightRearDoorOpen;
         public bool IsRightRearDoorOpen
         {
-            get { return isRightRearDoorOpen; }
+            get { return _isRightRearDoorOpen; }
             set
             {
-                isRightRearDoorOpen = value;
+                _isRightRearDoorOpen = value;
                 NotifyPropertyChanged(m => m.IsRightRearDoorOpen);
             }
         }
-                
     }
 }

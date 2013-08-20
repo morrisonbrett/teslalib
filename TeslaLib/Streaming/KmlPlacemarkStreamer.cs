@@ -1,60 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace TeslaLib.Streaming
 {
     [StreamingFormat(StreamingOutputFormat.KML_PLACEMARK)]
     public class KmlPlacemarkStreamer : AStreamer
     {
-
-        private StreamWriter writer;
+        private StreamWriter _writer;
 
         public override void Setup(string filePath, string valueString, string tripTitle)
         {
-            writer = new StreamWriter(filePath);
-            writer.AutoFlush = true;
+            _writer = new StreamWriter(filePath) {AutoFlush = true};
         }
 
         public override void BeforeStreaming()
         {
-            writer.WriteLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
-            writer.WriteLine(@"<kml xmlns=""http://www.opengis.net/kml/2.2"">");
-            writer.WriteLine("<Document>");
+            _writer.WriteLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
+            _writer.WriteLine(@"<kml xmlns=""http://www.opengis.net/kml/2.2"">");
+            _writer.WriteLine("<Document>");
         }
 
         public override void AfterStreaming()
         {
             if (NeedsToClose())
             {
-                writer.WriteLine("</Document>");
-                writer.WriteLine("</kml>");
+                _writer.WriteLine("</Document>");
+                _writer.WriteLine("</kml>");
 
-                writer.Close();
+                _writer.Close();
             }
         }
 
         public override bool NeedsToClose()
         {
-            return writer != null && writer.BaseStream != null;
+            return _writer != null && _writer.BaseStream != null;
         }
 
         public override void DataRecevied(string line)
         {
-            string speed = "";
-            string latitude = "";
-            string longitude = "";
-            string elevation = "";
+            const string speed = "";
+            const string latitude = "";
+            const string longitude = "";
+            const string elevation = "";
 
-            writer.WriteLine("<Placemark>");
-            writer.WriteLine("<Name>" + speed + "</Name");
-            writer.WriteLine("<Point>");
-            writer.WriteLine(string.Format("<coordinates>{0},{1},{2}</coordinates>", longitude, latitude, elevation));
-            writer.WriteLine("</Point>");
-            writer.WriteLine("</Placemark>");
+            _writer.WriteLine("<Placemark>");
+            _writer.WriteLine("<Name>" + speed + "</Name");
+            _writer.WriteLine("<Point>");
+            _writer.WriteLine("<coordinates>{0},{1},{2}</coordinates>", longitude, latitude, elevation);
+            _writer.WriteLine("</Point>");
+            _writer.WriteLine("</Placemark>");
         }
     }
 }

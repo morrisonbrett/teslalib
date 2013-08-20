@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
@@ -25,7 +21,7 @@ namespace TeslaManager.Other
         /// <returns></returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool isReversed = false;
+            var isReversed = false;
             
             if (parameter != null && parameter is string)
             {
@@ -35,7 +31,7 @@ namespace TeslaManager.Other
             if (value == null || !(value is bool))
                 return Visibility.Collapsed;
 
-            bool boolValue = (bool)value;
+            var boolValue = (bool)value;
 
             if (isReversed)
             {
@@ -60,16 +56,16 @@ namespace TeslaManager.Other
                 return true;
             }
 
-            bool isReversed = false;
+            var isReversed = false;
 
             if (parameter != null && parameter is string)
             {
                 bool.TryParse((string)parameter, out isReversed);
             }
 
-            Visibility visibility = (Visibility)value;
+            var visibility = (Visibility)value;
 
-            bool result = visibility == Visibility.Visible;
+            var result = visibility == Visibility.Visible;
 
             if (isReversed)
             {

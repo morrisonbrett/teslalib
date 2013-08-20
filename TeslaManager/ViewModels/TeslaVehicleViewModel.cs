@@ -1,10 +1,5 @@
 ﻿using SimpleMvvmToolkit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TeslaLib.Models;
+using TeslaManager.Models;
 
 namespace TeslaManager.ViewModels
 {
@@ -12,7 +7,13 @@ namespace TeslaManager.ViewModels
     {
         public TeslaVehicleViewModel()
         {
-            this.Model = new TeslaVehicleModel();
+            Model = new TeslaVehicleModel();
+        }
+
+        public override sealed TeslaVehicleModel Model
+        {
+            get { return base.Model; }
+            set { base.Model = value; }
         }
 
         #region Properties

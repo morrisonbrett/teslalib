@@ -1,22 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TeslaLib.Models
 {
     public class GuiSettingsStatus
     {
-
-        public GuiSettingsStatus()
-        {
-
-        }
-
         [JsonProperty(PropertyName = "gui_distance_units")]
         public string DistanceUnits { get; set; }
 

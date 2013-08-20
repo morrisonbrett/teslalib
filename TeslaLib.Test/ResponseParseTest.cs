@@ -1,8 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using TeslaLib.Models;
 
 namespace TeslaLib.Test
@@ -10,18 +8,17 @@ namespace TeslaLib.Test
     [TestClass]
     public class ResponseParseTest
     {
-
-        private TeslaClient client;
+        private readonly TeslaClient _client;
 
         public ResponseParseTest()
         {
-            client = new TeslaClient(true);
+            _client = new TeslaClient(true);
         }
 
         [TestMethod]
         public void ParseVehiclesTest()
         {
-            List<TeslaVehicle> cars = client.ParseVehicles(@"[{
+            var cars = _client.ParseVehicles(@"[{
             ""color"": null,
             ""display_name"": null,
             ""id"": 321,
@@ -37,7 +34,7 @@ namespace TeslaLib.Test
 
             Assert.AreEqual(1, cars.Count);
 
-            TeslaVehicle car = cars.FirstOrDefault();
+            var car = cars.FirstOrDefault();
 
             Assert.IsNotNull(car);
 
@@ -52,13 +49,12 @@ namespace TeslaLib.Test
             Assert.AreEqual(123, car.UserId);
             Assert.AreEqual(1234567890, car.VehicleId);
             Assert.AreEqual("5YJSA1CN5CFP01657", car.VIN);
-
         }
 
         [TestMethod]
         public void ParseMobileEnabledTest()
         {
-            MobileEnabledStatus status = client.ParseMobileEnabledStatus(@"{
+            var status = _client.ParseMobileEnabledStatus(@"{
             ""reason"":"""",
             ""result"":true
             }");
@@ -71,7 +67,7 @@ namespace TeslaLib.Test
         [TestMethod]
         public void ParseChargeStateStatus44Test()
         {
-            ChargeStateStatus status = client.ParseChargeStateStatus(@"{
+            var status = _client.ParseChargeStateStatus(@"{
             ""charging_state"": ""Complete"",
             ""charge_to_max_range"": false,
             ""max_range_charge_counter"": 0,
@@ -116,7 +112,7 @@ namespace TeslaLib.Test
         [TestMethod]
         public void ParseChargeStateStatus45Test()
         {
-            ChargeStateStatus status = client.ParseChargeStateStatus(@"{
+            var status = _client.ParseChargeStateStatus(@"{
             ""battery_current"": -0.6,
             ""battery_heater_on"": false,
             ""battery_level"": 90,
@@ -181,7 +177,7 @@ namespace TeslaLib.Test
         [TestMethod]
         public void ParseClimateStateStatusTest()
         {
-            ClimateStateStatus status = client.ParseClimateStateStatus(@"{
+            var status = _client.ParseClimateStateStatus(@"{
             ""inside_temp"": 17.0,
             ""outside_temp"": 9.5,
             ""driver_temp_setting"": 22.6,
@@ -207,7 +203,7 @@ namespace TeslaLib.Test
         [TestMethod]
         public void ParseDriveStateStatusTest()
         {
-            DriveStateStatus status = client.ParseDriveStateStatus(@"{
+            var status = _client.ParseDriveStateStatus(@"{
             ""shift_state"": null,
             ""speed"": null,
             ""latitude"": 33.794839,
@@ -228,7 +224,7 @@ namespace TeslaLib.Test
         [TestMethod]
         public void ParseGuiStateStatusTest()
         {
-            GuiSettingsStatus status = client.ParseGuiStateStatus(@"{
+            var status = _client.ParseGuiStateStatus(@"{
             ""gui_distance_units"": ""mi/hr"",
             ""gui_temperature_units"": ""F"",
             ""gui_charge_rate_units"": ""mi/hr"",
@@ -248,7 +244,7 @@ namespace TeslaLib.Test
         [TestMethod]
         public void ParseVehicleStateStatusTest()
         {
-            VehicleStateStatus status = client.ParseVehicleStateStatus(@"{
+            var status = _client.ParseVehicleStateStatus(@"{
             ""df"": false,
             ""dr"": false,
             ""pf"": false,
@@ -289,7 +285,7 @@ namespace TeslaLib.Test
         [TestMethod]
         public void ParseResultStatusTest()
         {
-            ResultStatus status = client.ParseMobileEnabledStatus(@"{
+            var status = _client.ParseMobileEnabledStatus(@"{
             ""reason"":""failure reason"",
             ""result"":false
             }");

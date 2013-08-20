@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace TeslaLib.Models
 {
     public class VehicleOptions
     {
-
         public VehicleOptions()
         {
-
         }
 
         public VehicleOptions(string optionCodes)
@@ -80,9 +76,9 @@ namespace TeslaLib.Models
         {
             // MS01,RENA,TM00,DRLH,PF00,BT85,PBCW,RFPO,WT19,IBMB,IDPB,TR00,SU01,SC01,TP01,AU01,CH00,HP00,PA00,PS00,AD02,X020,X025,X001,X003,X007,X011,X013
 
-            List<string> options = optionCodes.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var options = optionCodes.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
-            foreach (string option in options)
+            foreach (var option in options)
             {
 
                 switch (option)
@@ -131,7 +127,7 @@ namespace TeslaLib.Models
                         break;
                 }
 
-                string value2 = option.Substring(2, 2);
+                var value2 = option.Substring(2, 2);
 
                 switch (option.Substring(0, 2))
                 {
@@ -154,35 +150,34 @@ namespace TeslaLib.Models
                         BatterySize = int.Parse(value2);
                         break;
                     case "RF":
-                        if (value2 == "BC")
+                        switch (value2)
                         {
-                            RoofType = Models.RoofType.COLORED;
-                        }
-                        else if (value2 == "PO")
-                        {
-                            RoofType = Models.RoofType.NONE;
-                        }
-                        else if (value2 == "BK")
-                        {
-                            RoofType = Models.RoofType.BLACK;
+                            case "BC":
+                                RoofType = RoofType.COLORED;
+                                break;
+                            case "PO":
+                                RoofType = RoofType.NONE;
+                                break;
+                            case "BK":
+                                RoofType = RoofType.BLACK;
+                                break;
                         }
                         break;
                     case "WT":
-                        if (value2 == "19")
+                        switch (value2)
                         {
-                            WheelType = Models.WheelType.BASE_19;
-                        }
-                        else if (value2 == "21")
-                        {
-                            WheelType = Models.WheelType.SILVER_21;
-                        }
-                        else if (value2 == "SP")
-                        {
-                            WheelType = Models.WheelType.CHARCOAL_21;
-                        }
-                        else if (value2 == "SG")
-                        {
-                            WheelType = Models.WheelType.CHARCOAL_PERFORMANCE_21;
+                            case "19":
+                                WheelType = WheelType.BASE_19;
+                                break;
+                            case "21":
+                                WheelType = WheelType.SILVER_21;
+                                break;
+                            case "SP":
+                                WheelType = WheelType.CHARCOAL_21;
+                                break;
+                            case "SG":
+                                WheelType = WheelType.CHARCOAL_PERFORMANCE_21;
+                                break;
                         }
                         break;
                     case "ID":
@@ -222,7 +217,7 @@ namespace TeslaLib.Models
                         break;
                 }
 
-                string value3 = option.Substring(1,3);
+                var value3 = option.Substring(1,3);
                 switch (option.Substring(0, 1))
                 {
                     case "P":
@@ -309,7 +304,6 @@ namespace TeslaLib.Models
 
     public enum DriverSide
     {
-
         [EnumMember(Value = "LH")]
         LEFT_HAND_DRIVE,
 

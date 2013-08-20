@@ -1,9 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TeslaLib.Models;
 
 namespace TeslaLib.Test
@@ -11,18 +7,17 @@ namespace TeslaLib.Test
     [TestClass]
     public class FieldAnalysisTest
     {
-
-        private TeslaClient client;
+        private readonly TeslaClient _client;
 
         public FieldAnalysisTest()
         {
-            client = new TeslaClient(true);
+            _client = new TeslaClient(true);
         }
         
         [TestMethod]
         public void AddedFieldsTest()
         {
-            var fields = client.AnalyzeFields<ClimateStateStatus>(@"{
+            var fields = _client.AnalyzeFields<ClimateStateStatus>(@"{
             ""inside_temp"": 17.0,
             ""outside_temp"": 9.5,
             ""driver_temp_setting"": 22.6,
@@ -34,15 +29,15 @@ namespace TeslaLib.Test
             ""new_field"" : 10,
             }");
 
-            Assert.AreEqual(1, fields.Values.Where(f => f == FieldType.ADDED).Count());
-            Assert.AreEqual(0, fields.Values.Where(f => f == FieldType.REMOVED).Count());
-            Assert.AreEqual(8, fields.Values.Where(f => f == FieldType.UNCHANGED).Count());
+            Assert.AreEqual(1, fields.Values.Count(f => f == FieldType.ADDED));
+            Assert.AreEqual(0, fields.Values.Count(f => f == FieldType.REMOVED));
+            Assert.AreEqual(8, fields.Values.Count(f => f == FieldType.UNCHANGED));
         }
 
         [TestMethod]
         public void RemovedFieldsTest()
         {
-            var fields = client.AnalyzeFields<ClimateStateStatus>(@"{
+            var fields = _client.AnalyzeFields<ClimateStateStatus>(@"{
             ""inside_temp"": 17.0,
             ""outside_temp"": 9.5,
             ""driver_temp_setting"": 22.6,
@@ -52,15 +47,15 @@ namespace TeslaLib.Test
             ""is_rear_defroster_on"": false,
             }");
 
-            Assert.AreEqual(0, fields.Values.Where(f => f == FieldType.ADDED).Count());
-            Assert.AreEqual(1, fields.Values.Where(f => f == FieldType.REMOVED).Count());
-            Assert.AreEqual(7, fields.Values.Where(f => f == FieldType.UNCHANGED).Count());
+            Assert.AreEqual(0, fields.Values.Count(f => f == FieldType.ADDED));
+            Assert.AreEqual(1, fields.Values.Count(f => f == FieldType.REMOVED));
+            Assert.AreEqual(7, fields.Values.Count(f => f == FieldType.UNCHANGED));
         }
 
         [TestMethod]
         public void UnchagedFieldsTest()
         {
-            var fields = client.AnalyzeFields<ClimateStateStatus>(@"{
+            var fields = _client.AnalyzeFields<ClimateStateStatus>(@"{
             ""inside_temp"": 17.0,
             ""outside_temp"": 9.5,
             ""driver_temp_setting"": 22.6,
@@ -71,9 +66,9 @@ namespace TeslaLib.Test
             ""fan_status"": 0,
             }");
 
-            Assert.AreEqual(0, fields.Values.Where(f => f == FieldType.ADDED).Count());
-            Assert.AreEqual(0, fields.Values.Where(f => f == FieldType.REMOVED).Count());
-            Assert.AreEqual(8, fields.Values.Where(f => f == FieldType.UNCHANGED).Count());
+            Assert.AreEqual(0, fields.Values.Count(f => f == FieldType.ADDED));
+            Assert.AreEqual(0, fields.Values.Count(f => f == FieldType.REMOVED));
+            Assert.AreEqual(8, fields.Values.Count(f => f == FieldType.UNCHANGED));
         }
     }
 }

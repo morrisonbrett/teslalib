@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-
-// Toolkit namespace
-using SimpleMvvmToolkit;
+﻿// Toolkit namespace
 using TeslaManager.ViewModels;
 
 namespace TeslaManager.Locators

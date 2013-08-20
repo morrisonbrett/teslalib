@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TeslaLib
 {
@@ -12,13 +9,13 @@ namespace TeslaLib
         public static string GetEnumValue(this Enum enumValue)
         {
             //Look for DescriptionAttributes on the enum field
-            object[] attr = enumValue.GetType().GetField(enumValue.ToString())
+            var attr = enumValue.GetType().GetField(enumValue.ToString())
                 .GetCustomAttributes(typeof(EnumMemberAttribute), false);
 
             if (attr.Length > 0) // a DescriptionAttribute exists; use it
                 return ((EnumMemberAttribute)attr[0]).Value;
            
-            string result = enumValue.ToString();
+            var result = enumValue.ToString();
 
             return result;
         }

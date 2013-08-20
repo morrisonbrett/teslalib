@@ -21,9 +21,9 @@ namespace TeslaLib.Converters
         /// <returns></returns>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            string encoded = serializer.Deserialize<string>(reader);
+            var encoded = serializer.Deserialize<string>(reader);
 
-            VehicleOptions options = new VehicleOptions(encoded);
+            var options = new VehicleOptions(encoded);
 
             return options;
         }

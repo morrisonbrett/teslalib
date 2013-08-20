@@ -1,15 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json.Utilities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using TeslaLib.Converters;
 
 namespace TeslaLib.Models

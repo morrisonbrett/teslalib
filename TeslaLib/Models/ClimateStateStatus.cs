@@ -1,20 +1,9 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TeslaLib.Models
 {
     public class ClimateStateStatus
     {
-
-        public ClimateStateStatus()
-        {
-
-        }
-
         /// <summary>
         /// Degrees C inside the car
         /// </summary>

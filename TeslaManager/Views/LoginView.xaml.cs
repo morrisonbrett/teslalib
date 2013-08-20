@@ -35,5 +35,10 @@ namespace TeslaManager.Views
         {
             DialogResult = e.Data;
         }
+
+        public void Connect(int connectionId, object target)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

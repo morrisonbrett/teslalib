@@ -1,9 +1,6 @@
-﻿using SimpleMvvmToolkit;
+﻿using System.Threading.Tasks;
+using SimpleMvvmToolkit;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TeslaLib;
 using TeslaManager.Models;
 
@@ -15,12 +12,18 @@ namespace TeslaManager.ViewModels
         {
             Model = new LoginModel();
             
-            client = new TeslaClient(true);
+            _client = new TeslaClient();
+        }
+
+        public override sealed LoginModel Model
+        {
+            get { return base.Model; }
+            set { base.Model = value; }
         }
 
         #region Properties
 
-        private TeslaClient client;
+        private readonly TeslaClient _client;
 
         #endregion
 
@@ -32,11 +35,11 @@ namespace TeslaManager.ViewModels
 
         #region Commands
 
-        private DelegateCommand loginCommand;
+        private DelegateCommand _loginCommand;
         public DelegateCommand LoginCommand
         {
-            get { return loginCommand ?? (loginCommand = new DelegateCommand(Login)); }
-            private set { loginCommand = value; }
+            get { return _loginCommand ?? (_loginCommand = new DelegateCommand(Login)); }
+            private set { _loginCommand = value; }
         }
 
         #endregion
@@ -45,12 +48,11 @@ namespace TeslaManager.ViewModels
 
         public void Login()
         {
+            Task.Factory.StartNew(() => _client.LogIn(Model.Email, Model.Password));
 
-            //Task.Factory.StartNew(() => client.LogIn(Model.Email, Model.Password));
+            System.Windows.MessageBox.Show(_client.IsLoggedIn.ToString());
 
-            //System.Windows.MessageBox.Show(client.IsLoggedIn.ToString());
-
-            if (client.IsLoggedIn)
+            if (_client.IsLoggedIn)
             {
                 NotifyDialogResultHelper(true);
             }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TeslaLib;
-using TeslaLib.Models;
 
 namespace TeslaConsole
 {
@@ -17,16 +13,16 @@ namespace TeslaConsole
 
         public async Task Start()
         {
-            TeslaClient client = new TeslaClient(true);
+            var client = new TeslaClient(true);
 
             await client.LogInAsync("username", "password");
 
-            Console.WriteLine("Logged In: " + client.IsLoggedIn.ToString());
+            Console.WriteLine("Logged In: " + client.IsLoggedIn);
             Console.WriteLine();
 
             if (client.IsLoggedIn)
             {
-                List<TeslaVehicle> cars = await client.LoadVehiclesAsync();
+                var cars = await client.LoadVehiclesAsync();
 
                 if (cars.Count == 0)
                 {
@@ -35,7 +31,7 @@ namespace TeslaConsole
                 }
 
                 Console.WriteLine("Vehicles:");
-                foreach (TeslaVehicle car in cars)
+                foreach (var car in cars)
                 {
                     Console.WriteLine(car.Id + " " + car.VIN);
                 }

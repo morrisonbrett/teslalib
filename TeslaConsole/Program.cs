@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TeslaLib;
 
 namespace TeslaConsole
 {
@@ -11,7 +6,7 @@ namespace TeslaConsole
     {
         public static void Main(string[] args)
         {
-            TeslaConsole console = new TeslaConsole();
+            var console = new TeslaConsole();
 
             console.MainAsync().Wait();
 

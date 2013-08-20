@@ -1,9 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using System.Globalization;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -18,11 +15,13 @@ using System.Threading.Tasks;
 using TeslaLib.Models;
 using TeslaLib.Streaming;
 
+// ReSharper disable InconsistentNaming
+// ReSharper disable EmptyGeneralCatchClause
+// ReSharper disable PossibleNullReferenceException
 namespace TeslaLib
 {
     public class TeslaClient : IDisposable
     {
-
         #region API Paths
 
         public string TESLA_STREAMING_SERVER
@@ -37,14 +36,7 @@ namespace TeslaLib
         {
             get
             {
-                if (IsDebugMode)
-                {
-                    return "https://private-857c-timdorr.apiary.io/";
-                }
-                else
-                {
-                    return "https://portal.vn.teslamotors.com/";
-                }
+                return IsDebugMode ? "https://private-857c-timdorr.apiary.io/" : "https://portal.vn.teslamotors.com/";
             }
         }
 
@@ -232,7 +224,7 @@ namespace TeslaLib
 
         public string Email { get; private set; }
 
-        private TeslaWebClient webClient = new TeslaWebClient();
+        private readonly TeslaWebClient webClient = new TeslaWebClient();
 
         public TeslaClient(bool isDebugMode = false)
         {
@@ -242,14 +234,15 @@ namespace TeslaLib
 
         public void TestCommands()
         {
-            string username = "test@test.com";
-            string password = "password";
+            // ReSharper disable UnusedVariable
+            const string username = "test@test.com";
+            const string password = "password";
 
-            bool success = LogIn(username, password);
+            var success = LogIn(username, password);
 
-            List<TeslaVehicle> vehicles = LoadVehicles();
+            var vehicles = LoadVehicles();
 
-            TeslaVehicle car = vehicles.FirstOrDefault();
+            var car = vehicles.FirstOrDefault();
 
             if (car != null)
             {
@@ -277,9 +270,10 @@ namespace TeslaLib
 
                 Console.WriteLine("Executed All Commands");
             }
+            // ReSharper restore UnusedVariable
         }
 
-        private string RemoveComments(string str)
+        private static string RemoveComments(string str)
         {
             return Regex.Replace(str, @"//(.*?)\r?\n", "\n");
         }
@@ -288,7 +282,7 @@ namespace TeslaLib
         {
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(server, path));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(server, path));
 
                 return AnalyzeFields<T>(response);
             }
@@ -306,7 +300,7 @@ namespace TeslaLib
         {
             try
             {
-                string response = webClient.DownloadString(Path.Combine(server, path));
+                var response = webClient.DownloadString(Path.Combine(server, path));
 
                 return AnalyzeFields<T>(response);
             }
@@ -322,7 +316,7 @@ namespace TeslaLib
 
         public Dictionary<string, FieldType> AnalyzeFields<T>(string response)
         {
-            Dictionary<string, FieldType> fieldDict = new Dictionary<string, FieldType>();
+            var fieldDict = new Dictionary<string, FieldType>();
 
             try
             {
@@ -330,7 +324,7 @@ namespace TeslaLib
 
                 JObject rootObject = null;
 
-                JToken token = JToken.Parse(response);
+                var token = JToken.Parse(response);
                 if (token.Type == JTokenType.Array)
                 {
                     rootObject = token.First as JObject;
@@ -341,27 +335,27 @@ namespace TeslaLib
                 }
 
 
-                List<string> currentFields = rootObject.Properties().Select(p => p.Name).ToList();
+                var currentFields = rootObject.Properties().Select(p => p.Name).ToList();
 
-                List<string> expectedFields = typeof(T).GetProperties()
+                var expectedFields = typeof(T).GetProperties()
                     .Where(p => p.IsDefined(typeof(JsonPropertyAttribute), false))
                     .Select(p => ((JsonPropertyAttribute[])p.GetCustomAttributes(typeof(JsonPropertyAttribute), false)).Single().PropertyName).ToList();
 
-                List<string> newFields = currentFields.Except(expectedFields).ToList();
-                List<string> removedFields = expectedFields.Except(currentFields).ToList();
-                List<string> sameFields = currentFields.Except(newFields).ToList();
+                var newFields = currentFields.Except(expectedFields).ToList();
+                var removedFields = expectedFields.Except(currentFields).ToList();
+                var sameFields = currentFields.Except(newFields).ToList();
 
-                foreach (string field in newFields)
+                foreach (var field in newFields)
                 {
                     fieldDict.Add(field, FieldType.ADDED);
                 }
 
-                foreach (string field in removedFields)
+                foreach (var field in removedFields)
                 {
                     fieldDict.Add(field, FieldType.REMOVED);
                 }
 
-                foreach (string field in sameFields)
+                foreach (var field in sameFields)
                 {
                     fieldDict.Add(field, FieldType.UNCHANGED);
                 }
@@ -386,16 +380,16 @@ namespace TeslaLib
             {
 
                 // Set up POST parameters.
-                var values = new NameValueCollection() 
-                 { 
+                var values = new NameValueCollection
+                { 
                     { "user_session[email]", username },
                     { "user_session[password]", password }
                  };
 
                 // Perform the POST request.
-                byte[] data = webClient.UploadValues(Path.Combine(TESLA_SERVER, LOGIN_PATH), values);
+                var data = webClient.UploadValues(Path.Combine(TESLA_SERVER, LOGIN_PATH), values);
 
-                string response = System.Text.Encoding.ASCII.GetString(data);
+                var response = Encoding.ASCII.GetString(data);
 
                 if (response.Contains("You do not have access"))
                 {
@@ -426,13 +420,15 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, VEHICLES_PATH));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, VEHICLES_PATH));
 
-                List<TeslaVehicle> vehicles = ParseVehicles(response);
+                var vehicles = ParseVehicles(response);
 
                 return vehicles;
             }
-            catch (Exception e)
+
+            catch (Exception)
+
             {
 
             }
@@ -454,13 +450,13 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(MOBILE_ENABLED_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(MOBILE_ENABLED_PATH, vehicle.Id)));
 
-                MobileEnabledStatus status = ParseMobileEnabledStatus(response);
+                var status = ParseMobileEnabledStatus(response);
 
                 return status;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -482,15 +478,15 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STATE_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
-                ChargeStateStatus status = ParseChargeStateStatus(response);
+                var status = ParseChargeStateStatus(response);
 
                 return status;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -512,15 +508,15 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CLIMATE_STATE_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CLIMATE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
-                ClimateStateStatus status = ParseClimateStateStatus(response);
+                var status = ParseClimateStateStatus(response);
 
                 return status;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -542,15 +538,15 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(DRIVE_STATE_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(DRIVE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
-                DriveStateStatus status = ParseDriveStateStatus(response);
+                var status = ParseDriveStateStatus(response);
 
                 return status;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -572,13 +568,13 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(GUI_SETTINGS_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(GUI_SETTINGS_PATH, vehicle.Id)));
 
-                GuiSettingsStatus status = ParseGuiStateStatus(response);
+                var status = ParseGuiStateStatus(response);
 
                 return status;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -600,15 +596,15 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(VEHICLE_STATE_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(VEHICLE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
-                VehicleStateStatus status = ParseVehicleStateStatus(response);
+                var status = ParseVehicleStateStatus(response);
 
                 return status;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -630,9 +626,9 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(WAKE_UP_PATH, vehicle.Id)));
+                webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(WAKE_UP_PATH, vehicle.Id)));
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -652,13 +648,13 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CHARGE_PORT_DOOR_OPEN_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CHARGE_PORT_DOOR_OPEN_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -683,13 +679,13 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(SET_CHARGE_LIMIT, vehicle.Id, percent)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(SET_CHARGE_LIMIT, vehicle.Id, percent)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -711,15 +707,15 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STATE_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -741,15 +737,15 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STOP_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STOP_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -771,13 +767,13 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(FLASH_LIGHTS_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(FLASH_LIGHTS_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -799,13 +795,13 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(HONK_HORN_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(HONK_HORN_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -827,13 +823,13 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(DOOR_UNLOCK_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(DOOR_UNLOCK_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -855,13 +851,13 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(DOOR_LOCK_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(DOOR_LOCK_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -883,8 +879,8 @@ namespace TeslaLib
 
             try
             {
-                int TEMP_MAX = 32;
-                int TEMP_MIN = 17;
+                const int TEMP_MAX = 32;
+                const int TEMP_MIN = 17;
 
                 driverTemp = Math.Max(driverTemp, TEMP_MIN);
                 driverTemp = Math.Min(driverTemp, TEMP_MAX);
@@ -892,13 +888,13 @@ namespace TeslaLib
                 passengerTemp = Math.Max(passengerTemp, TEMP_MIN);
                 passengerTemp = Math.Min(passengerTemp, TEMP_MAX);
 
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(SET_TEMPERATURE_PATH, vehicle.Id, driverTemp, passengerTemp)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(SET_TEMPERATURE_PATH, vehicle.Id, driverTemp, passengerTemp)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -920,13 +916,13 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(HVAC_START_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(HVAC_START_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -948,13 +944,13 @@ namespace TeslaLib
 
             try
             {
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(HVAC_STOP_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(HVAC_STOP_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -978,10 +974,10 @@ namespace TeslaLib
             {
                 if (vehicle.Options.RoofType != RoofType.NONE)
                 {
-                    return new ResultStatus() { Result = false, Reason = "No Panoramic Roof" };
+                    return new ResultStatus { Result = false, Reason = "No Panoramic Roof" };
                 }
 
-                string response = "";
+                string response;
 
                 if (roofState == PanoramicRoofState.MOVE)
                 {
@@ -992,11 +988,11 @@ namespace TeslaLib
                     response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(SUN_ROOF_CONTROL_PATH, vehicle.Id, roofState.GetEnumValue())));
                 }
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1027,11 +1023,11 @@ namespace TeslaLib
             {
                 values = "speed,odometer,soc,elevation,est_heading,est_lat,est_lng,power,shift_state,range,est_range";
 
-                string response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format("stream/{0}/?values={1}", vehicle.VehicleId, values)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format("stream/{0}/?values={1}", vehicle.VehicleId, values)));
 
                 return response;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1047,18 +1043,17 @@ namespace TeslaLib
         {
             try
             {
-
                 // Set up POST parameters.
-                var values = new NameValueCollection() 
-                 { 
+                var values = new NameValueCollection
+                             { 
                     { "user_session[email]", username },
                     { "user_session[password]", password }
                  };
 
                 // Perform the POST request.
-                byte[] data = await webClient.UploadValuesTaskAsync(Path.Combine(TESLA_SERVER, LOGIN_PATH), values);
+                var data = await webClient.UploadValuesTaskAsync(Path.Combine(TESLA_SERVER, LOGIN_PATH), values);
 
-                string response = System.Text.Encoding.ASCII.GetString(data);
+                var response = Encoding.ASCII.GetString(data);
 
                 if (response.Contains("You do not have access"))
                 {
@@ -1089,13 +1084,13 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, VEHICLES_PATH));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, VEHICLES_PATH));
 
-                List<TeslaVehicle> vehicles = ParseVehicles(response);
+                var vehicles = ParseVehicles(response);
 
                 return vehicles;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1117,13 +1112,13 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(MOBILE_ENABLED_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(MOBILE_ENABLED_PATH, vehicle.Id)));
 
-                MobileEnabledStatus status = ParseMobileEnabledStatus(response);
+                var status = ParseMobileEnabledStatus(response);
 
                 return status;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1145,15 +1140,15 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STATE_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
-                ChargeStateStatus status = ParseChargeStateStatus(response);
+                var status = ParseChargeStateStatus(response);
 
                 return status;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1175,15 +1170,15 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CLIMATE_STATE_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CLIMATE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
-                ClimateStateStatus status = ParseClimateStateStatus(response);
+                var status = ParseClimateStateStatus(response);
 
                 return status;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1205,15 +1200,15 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(DRIVE_STATE_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(DRIVE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
-                DriveStateStatus status = ParseDriveStateStatus(response);
+                var status = ParseDriveStateStatus(response);
 
                 return status;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1235,13 +1230,13 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(GUI_SETTINGS_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(GUI_SETTINGS_PATH, vehicle.Id)));
 
-                GuiSettingsStatus status = ParseGuiStateStatus(response);
+                var status = ParseGuiStateStatus(response);
 
                 return status;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1263,15 +1258,15 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(VEHICLE_STATE_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(VEHICLE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
-                VehicleStateStatus status = ParseVehicleStateStatus(response);
+                var status = ParseVehicleStateStatus(response);
 
                 return status;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1293,9 +1288,9 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(WAKE_UP_PATH, vehicle.Id)));
+                await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(WAKE_UP_PATH, vehicle.Id)));
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1315,13 +1310,13 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CHARGE_PORT_DOOR_OPEN_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CHARGE_PORT_DOOR_OPEN_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1346,15 +1341,14 @@ namespace TeslaLib
 
             try
             {
-
                 // TODO: Check for v4.5
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(SET_CHARGE_LIMIT, vehicle.Id, percent)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(SET_CHARGE_LIMIT, vehicle.Id, percent)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1376,15 +1370,15 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STATE_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1406,15 +1400,15 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STOP_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STOP_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1436,13 +1430,13 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(FLASH_LIGHTS_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(FLASH_LIGHTS_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1464,13 +1458,13 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(HONK_HORN_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(HONK_HORN_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1492,13 +1486,13 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(DOOR_UNLOCK_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(DOOR_UNLOCK_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1520,13 +1514,13 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(DOOR_LOCK_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(DOOR_LOCK_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1548,8 +1542,8 @@ namespace TeslaLib
 
             try
             {
-                int TEMP_MAX = 32;
-                int TEMP_MIN = 17;
+                const int TEMP_MAX = 32;
+                const int TEMP_MIN = 17;
 
                 driverTemp = Math.Max(driverTemp, TEMP_MIN);
                 driverTemp = Math.Min(driverTemp, TEMP_MAX);
@@ -1557,13 +1551,13 @@ namespace TeslaLib
                 passengerTemp = Math.Max(passengerTemp, TEMP_MIN);
                 passengerTemp = Math.Min(passengerTemp, TEMP_MAX);
 
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(SET_TEMPERATURE_PATH, vehicle.Id, driverTemp, passengerTemp)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(SET_TEMPERATURE_PATH, vehicle.Id, driverTemp, passengerTemp)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1585,13 +1579,13 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(HVAC_START_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(HVAC_START_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1613,13 +1607,13 @@ namespace TeslaLib
 
             try
             {
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(HVAC_STOP_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(HVAC_STOP_PATH, vehicle.Id)));
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1643,10 +1637,10 @@ namespace TeslaLib
             {
                 if (vehicle.Options.RoofType != RoofType.NONE)
                 {
-                    return new ResultStatus() { Result = false, Reason = "No Panoramic Roof" };
+                    return new ResultStatus { Result = false, Reason = "No Panoramic Roof" };
                 }
 
-                string response = "";
+                string response;
 
                 if (roofState == PanoramicRoofState.MOVE)
                 {
@@ -1657,11 +1651,11 @@ namespace TeslaLib
                     response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(SUN_ROOF_CONTROL_PATH, vehicle.Id, roofState.GetEnumValue())));
                 }
 
-                ResultStatus result = ParseResultStatus(response);
+                var result = ParseResultStatus(response);
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1691,14 +1685,14 @@ namespace TeslaLib
             {
                 values = "speed,odometer,soc,elevation,est_heading,est_lat,est_lng,power,shift_state,range,est_range";
 
-                string response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format("stream/{0}/?values={1}", vehicle.VehicleId, values)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format("stream/{0}/?values={1}", vehicle.VehicleId, values)));
 
                 //ResultStatus result = ParseResultStatus(response);
 
                 return response;
                 //return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -1712,58 +1706,58 @@ namespace TeslaLib
 
         public List<TeslaVehicle> ParseVehicles(string response)
         {
-            List<TeslaVehicle> vehicles = JsonConvert.DeserializeObject<List<TeslaVehicle>>(response);
+            var vehicles = JsonConvert.DeserializeObject<List<TeslaVehicle>>(response);
 
-            TeslaVehicle first = vehicles.FirstOrDefault();
+            var first = vehicles.FirstOrDefault();
 
             return vehicles;
         }
 
         public MobileEnabledStatus ParseMobileEnabledStatus(string response)
         {
-            MobileEnabledStatus status = JsonConvert.DeserializeObject<MobileEnabledStatus>(response);
+            var status = JsonConvert.DeserializeObject<MobileEnabledStatus>(response);
 
             return status;
         }
 
         public ChargeStateStatus ParseChargeStateStatus(string response)
         {
-            ChargeStateStatus status = JsonConvert.DeserializeObject<ChargeStateStatus>(response);
+            var status = JsonConvert.DeserializeObject<ChargeStateStatus>(response);
 
             return status;
         }
 
         public ClimateStateStatus ParseClimateStateStatus(string response)
         {
-            ClimateStateStatus status = JsonConvert.DeserializeObject<ClimateStateStatus>(response);
+            var status = JsonConvert.DeserializeObject<ClimateStateStatus>(response);
 
             return status;
         }
 
         public DriveStateStatus ParseDriveStateStatus(string response)
         {
-            DriveStateStatus status = JsonConvert.DeserializeObject<DriveStateStatus>(response);
+            var status = JsonConvert.DeserializeObject<DriveStateStatus>(response);
 
             return status;
         }
 
         public GuiSettingsStatus ParseGuiStateStatus(string response)
         {
-            GuiSettingsStatus status = JsonConvert.DeserializeObject<GuiSettingsStatus>(response);
+            var status = JsonConvert.DeserializeObject<GuiSettingsStatus>(response);
 
             return status;
         }
 
         public VehicleStateStatus ParseVehicleStateStatus(string response)
         {
-            VehicleStateStatus status = JsonConvert.DeserializeObject<VehicleStateStatus>(response);
+            var status = JsonConvert.DeserializeObject<VehicleStateStatus>(response);
 
             return status;
         }
 
         public ResultStatus ParseResultStatus(string response)
         {
-            ResultStatus status = JsonConvert.DeserializeObject<ResultStatus>(response);
+            var status = JsonConvert.DeserializeObject<ResultStatus>(response);
 
             return status;
         }
@@ -1782,19 +1776,18 @@ namespace TeslaLib
             {
                 // RELOAD TOKENS
                 await WakeUpAsync(vehicle);
-                List<TeslaVehicle> cars = await LoadVehiclesAsync();
+                var cars = await LoadVehiclesAsync();
 
                 vehicle = cars.FirstOrDefault(c => c.Id == vehicle.Id);
             }
 
-            string strBasicAuthInfo = string.Format("{0}:{1}", Email, vehicle.Tokens[0]);
+            var strBasicAuthInfo = string.Format("{0}:{1}", Email, vehicle.Tokens[0]);
 
-            bool isStopStreaming = false;
+            var isStopStreaming = false;
 
-            StreamingOutputFormat outputFormat = (StreamingOutputFormat)Enum.Parse(typeof(StreamingOutputFormat), outputFormatMode.ToString());
+            var outputFormat = (StreamingOutputFormat)Enum.Parse(typeof(StreamingOutputFormat), outputFormatMode.ToString(CultureInfo.InvariantCulture));
 
-
-            string extension = "txt";
+            var extension = "txt";
 
             switch (outputFormat)
             {
@@ -1808,47 +1801,48 @@ namespace TeslaLib
             }
 
             // Find the Streamer using Reflection
-            Type t = GetTypeWithStreamingOutputAttribute(outputFormat);
-            AStreamer streamer = (AStreamer) Activator.CreateInstance(t);
+            var t = GetTypeWithStreamingOutputAttribute(outputFormat);
+            var streamer = (AStreamer) Activator.CreateInstance(t);
             
-            string filePath = Path.Combine(outputDirectory, string.Format("{0}_{1}.{2}", DateTime.Now.ToString("MM_dd_yyyy"), tripName, extension));
-
+            var filePath = Path.Combine(outputDirectory, string.Format("{0}_{1}.{2}", DateTime.Now.ToString("MM_dd_yyyy"), tripName, extension));
 
             streamer.Setup(filePath, valuesToStream, tripName);
             streamer.BeforeStreaming();
 
             while (!isStopStreaming)
             {
-                HttpWebRequest request = HttpWebRequest.CreateHttp(new Uri(Path.Combine(TESLA_STREAMING_SERVER, "stream", vehicle.VehicleId.ToString(), "?values=" + valuesToStream)));
+                var request = WebRequest.CreateHttp(new Uri(Path.Combine(TESLA_STREAMING_SERVER, "stream", vehicle.VehicleId.ToString(CultureInfo.InvariantCulture), "?values=" + valuesToStream)));
                 request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(strBasicAuthInfo));
                 request.Timeout = 12500; // a bit more than the expected 2 minute max long poll
 
-                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+                var response = (HttpWebResponse)await request.GetResponseAsync();
 
-                if (response.StatusCode == HttpStatusCode.OK)
+                switch (response.StatusCode)
                 {
-                    using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-                    {
-                        string line = null;
-
-                        while ((line = reader.ReadLine()) != null)
+                    case HttpStatusCode.OK:
+                        using (var reader = new StreamReader(response.GetResponseStream()))
                         {
-                            // DATA RECEIVED
-                            streamer.DataRecevied(line);
-                        }
-                    }
-                }
-                else if (response.StatusCode == HttpStatusCode.Unauthorized)
-                {
-                    // RELOAD TOKENS
-                    await WakeUpAsync(vehicle);
-                    List<TeslaVehicle> cars = await LoadVehiclesAsync();
+                            string line;
 
-                    vehicle = cars.FirstOrDefault(c => c.Id == vehicle.Id);
-                }
-                else
-                {
-                    isStopStreaming = true;
+                            while ((line = reader.ReadLine()) != null)
+                            {
+                                // DATA RECEIVED
+                                streamer.DataRecevied(line);
+                            }
+                        }
+                        break;
+                    case HttpStatusCode.Unauthorized:
+                    {
+                        // RELOAD TOKENS
+                        await WakeUpAsync(vehicle);
+                        var cars = await LoadVehiclesAsync();
+
+                        vehicle = cars.FirstOrDefault(c => c.Id == vehicle.Id);
+                    }
+                        break;
+                    default:
+                        isStopStreaming = true;
+                        break;
                 }
             }
 
@@ -1857,18 +1851,16 @@ namespace TeslaLib
 
         private static Type GetTypeWithStreamingOutputAttribute(StreamingOutputFormat format)
         {
-            Type attributeType = typeof(StreamingFormatAttribute);
+            var attributeType = typeof(StreamingFormatAttribute);
             
-            foreach (Type type in  Assembly.GetExecutingAssembly().GetTypes())
+            foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
             {
-                if (type.IsDefined(attributeType))
-                {
-                    StreamingFormatAttribute a = type.GetCustomAttribute<StreamingFormatAttribute>();
+                if (!type.IsDefined(attributeType)) continue;
+                var a = type.GetCustomAttribute<StreamingFormatAttribute>();
                     
-                    if (a.OutputFormat == format)
-                    {
-                        return type;
-                    }
+                if (a.OutputFormat == format)
+                {
+                    return type;
                 }
             }
 
@@ -1885,3 +1877,6 @@ namespace TeslaLib
         }
     }
 }
+// ReSharper restore InconsistentNaming
+// ReSharper restore EmptyGeneralCatchClause
+// ReSharper restore PossibleNullReferenceException

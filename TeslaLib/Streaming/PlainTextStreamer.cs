@@ -1,40 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace TeslaLib.Streaming
 {
     [StreamingFormat(StreamingOutputFormat.PLAIN_TEXT)]
     public class PlainTextStreamer : AStreamer
     {
-
-        private StreamWriter writer;
+        private StreamWriter _writer;
 
         public override void Setup(string filePath, string valueString, string tripTitle)
         {
-            writer = new StreamWriter(filePath);
-            writer.AutoFlush = true;
+            _writer = new StreamWriter(filePath) {AutoFlush = true};
         }
 
         public override void AfterStreaming()
         {
             if (NeedsToClose())
             {
-                writer.Close();
+                _writer.Close();
             }
         }
 
         public override void DataRecevied(string line)
         {
-            writer.WriteLine(line);
+            _writer.WriteLine(line);
         }
 
         public override bool NeedsToClose()
         {
-            return writer != null && writer.BaseStream != null;
+            return _writer != null && _writer.BaseStream != null;
         }
     }
 }

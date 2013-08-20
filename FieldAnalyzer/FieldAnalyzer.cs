@@ -9,12 +9,6 @@ namespace FieldAnalyzer
 {
     public class FieldAnalyzer
     {
-
-        public FieldAnalyzer()
-        {
-
-        }
-
         public async Task MainAsync()
         {
             await Task.Factory.StartNew(() => Start());
@@ -22,17 +16,17 @@ namespace FieldAnalyzer
 
         public async Task Start()
         {
-            TeslaClient client = new TeslaClient(true);
+            var client = new TeslaClient(true);
 
             await client.LogInAsync("username", "password");
 
             if (client.IsLoggedIn)
             {
-                List<TeslaVehicle> cars = await client.LoadVehiclesAsync();
+                var cars = await client.LoadVehiclesAsync();
 
-                TeslaVehicle car = cars.FirstOrDefault();
+                var car = cars.FirstOrDefault();
 
-                bool showUnchanged = true;
+                const bool showUnchanged = true;
                 WriteModifiedFields(await client.AnalyzeFieldsAsync<TeslaVehicle>(client.TESLA_SERVER, client.VEHICLES_PATH), showUnchanged);
                 WriteModifiedFields(await client.AnalyzeFieldsAsync<ChargeStateStatus>(client.TESLA_SERVER, string.Format(client.CHARGE_STATE_PATH, car.Id)), showUnchanged);
                 WriteModifiedFields(await client.AnalyzeFieldsAsync<ClimateStateStatus>(client.TESLA_SERVER, string.Format(client.CLIMATE_STATE_PATH, car.Id)), showUnchanged);
@@ -46,9 +40,9 @@ namespace FieldAnalyzer
 
         private void WriteModifiedFields(Dictionary<string, FieldType> fieldDict, bool showUnchanged = true)
         {
-            foreach (string key in fieldDict.Keys)
+            foreach (var key in fieldDict.Keys)
             {
-                FieldType type = fieldDict[key];
+                var type = fieldDict[key];
 
                 if (showUnchanged || type != FieldType.UNCHANGED)
                 {

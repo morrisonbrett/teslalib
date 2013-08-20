@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TeslaLib;
 
@@ -31,12 +32,17 @@ namespace TeslaConsole
                 }
 
                 Console.WriteLine("Vehicles:");
-                foreach (var car in cars)
+                foreach (var c in cars)
                 {
-                    Console.WriteLine(car.Id + " " + car.VIN);
+                    Console.WriteLine(c.Id + " " + c.VIN);
                 }
 
-                //TeslaVehicle car = cars.FirstOrDefault();
+                var car = cars.FirstOrDefault();
+                if (car == null) return;
+
+                var a = client.LoadChargeStateStatus(car);
+                Console.WriteLine("Charging State: " + a.ChargingState);
+                Console.WriteLine("Battery Range: " + a.BatteryRange);
             }
         }
     }

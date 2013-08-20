@@ -374,11 +374,26 @@ namespace TeslaLib
 
         #region Web Methods
 
+        private void RequireLogin()
+        {
+            if (!IsLoggedIn)
+            {
+                throw new AuthenticationException("Error: Not logged in");
+            }
+        }
+
+        private static void RequireVehicle(TeslaVehicle vehicle)
+        {
+            if (vehicle == null)
+            {
+                throw new ArgumentNullException("vehicle");
+            }
+        }
+
         public bool LogIn(string username, string password)
         {
             try
             {
-
                 // Set up POST parameters.
                 var values = new NameValueCollection
                 { 
@@ -413,10 +428,7 @@ namespace TeslaLib
 
         public List<TeslaVehicle> LoadVehicles()
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
+            RequireLogin();
 
             try
             {
@@ -438,15 +450,8 @@ namespace TeslaLib
 
         public MobileEnabledStatus LoadMobileEnabledStatus(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -466,15 +471,8 @@ namespace TeslaLib
 
         public ChargeStateStatus LoadChargeStateStatus(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -496,15 +494,8 @@ namespace TeslaLib
 
         public ClimateStateStatus LoadClimateStateStatus(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -526,15 +517,8 @@ namespace TeslaLib
 
         public DriveStateStatus LoadDriveStateStatus(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -556,15 +540,8 @@ namespace TeslaLib
 
         public GuiSettingsStatus LoadGuiStateStatus(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -584,15 +561,8 @@ namespace TeslaLib
 
         public VehicleStateStatus LoadVehicleStateStatus(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -614,15 +584,8 @@ namespace TeslaLib
 
         public void WakeUp(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -636,15 +599,8 @@ namespace TeslaLib
 
         public ResultStatus OpenChargePortDoor(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -664,15 +620,8 @@ namespace TeslaLib
 
         public ResultStatus SetChargeLimit(TeslaVehicle vehicle, int percent = 50)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             percent = Math.Max(percent, 50);
             percent = Math.Min(percent, 100);
@@ -695,15 +644,8 @@ namespace TeslaLib
 
         public ResultStatus StartCharge(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -725,15 +667,8 @@ namespace TeslaLib
 
         public ResultStatus StopCharge(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -755,15 +690,8 @@ namespace TeslaLib
 
         public ResultStatus FlashLights(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -783,15 +711,8 @@ namespace TeslaLib
 
         public ResultStatus HonkHorn(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -811,15 +732,8 @@ namespace TeslaLib
 
         public ResultStatus UnlockDoors(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -839,15 +753,8 @@ namespace TeslaLib
 
         public ResultStatus LockDoors(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -867,15 +774,8 @@ namespace TeslaLib
 
         public ResultStatus SetTemperatureSettings(TeslaVehicle vehicle, int driverTemp = 17, int passengerTemp = 17)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -904,15 +804,8 @@ namespace TeslaLib
 
         public ResultStatus StartHVAC(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -932,15 +825,8 @@ namespace TeslaLib
 
         public ResultStatus StopHVAC(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -960,15 +846,8 @@ namespace TeslaLib
 
         public ResultStatus SetPanoramicRoofLevel(TeslaVehicle vehicle, PanoramicRoofState roofState, int percentOpen = 0)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1009,15 +888,8 @@ namespace TeslaLib
         /// <returns></returns>
         public string LoadStreamingValues(TeslaVehicle vehicle, string values)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1077,10 +949,7 @@ namespace TeslaLib
 
         public async Task<List<TeslaVehicle>> LoadVehiclesAsync()
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
+            RequireLogin();
 
             try
             {
@@ -1100,15 +969,8 @@ namespace TeslaLib
 
         public async Task<MobileEnabledStatus> LoadMobileEnabledStatusAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1128,15 +990,8 @@ namespace TeslaLib
 
         public async Task<ChargeStateStatus> LoadChargeStateStatusAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1158,15 +1013,8 @@ namespace TeslaLib
 
         public async Task<ClimateStateStatus> LoadClimateStateStatusAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1188,15 +1036,8 @@ namespace TeslaLib
 
         public async Task<DriveStateStatus> LoadDriveStateStatusAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1218,15 +1059,8 @@ namespace TeslaLib
 
         public async Task<GuiSettingsStatus> LoadGuiStateStatusAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1246,15 +1080,8 @@ namespace TeslaLib
 
         public async Task<VehicleStateStatus> LoadVehicleStateStatusAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1276,15 +1103,8 @@ namespace TeslaLib
 
         public async Task WakeUpAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1298,15 +1118,8 @@ namespace TeslaLib
 
         public async Task<ResultStatus> OpenChargePortDoorAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1326,15 +1139,8 @@ namespace TeslaLib
 
         public async Task<ResultStatus> SetChargeLimitAsync(TeslaVehicle vehicle, int percent = 50)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             percent = Math.Max(percent, 50);
             percent = Math.Min(percent, 100);
@@ -1358,15 +1164,8 @@ namespace TeslaLib
 
         public async Task<ResultStatus> StartChargeAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1388,15 +1187,8 @@ namespace TeslaLib
 
         public async Task<ResultStatus> StopChargeAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1418,15 +1210,8 @@ namespace TeslaLib
 
         public async Task<ResultStatus> FlashLightsAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1446,15 +1231,8 @@ namespace TeslaLib
 
         public async Task<ResultStatus> HonkHornAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1474,15 +1252,8 @@ namespace TeslaLib
 
         public async Task<ResultStatus> UnlockDoorsAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1502,15 +1273,8 @@ namespace TeslaLib
 
         public async Task<ResultStatus> LockDoorsAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1530,15 +1294,8 @@ namespace TeslaLib
 
         public async Task<ResultStatus> SetTemperatureSettingsAsync(TeslaVehicle vehicle, int driverTemp = 17, int passengerTemp = 17)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1567,15 +1324,8 @@ namespace TeslaLib
 
         public async Task<ResultStatus> StartHVACAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1595,15 +1345,8 @@ namespace TeslaLib
 
         public async Task<ResultStatus> StopHVACAsync(TeslaVehicle vehicle)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1623,15 +1366,8 @@ namespace TeslaLib
 
         public async Task<ResultStatus> SetPanoramicRoofLevelAsync(TeslaVehicle vehicle, PanoramicRoofState roofState, int percentOpen = 0)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1671,15 +1407,8 @@ namespace TeslaLib
         /// <returns></returns>
         public async Task<string> LoadStreamingValuesAsync(TeslaVehicle vehicle, string values)
         {
-            if (!IsLoggedIn)
-            {
-                throw new AuthenticationException("Error: Not logged in");
-            }
-
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException("vehicle");
-            }
+            RequireLogin();
+            RequireVehicle(vehicle);
 
             try
             {
@@ -1866,7 +1595,6 @@ namespace TeslaLib
 
             return null;
         }
-        
 
         public void Dispose()
         {

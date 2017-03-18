@@ -64,6 +64,7 @@
     <Compile Include="Streaming\PlainTextStreamer.cs" />
     <Compile Include="TeslaClient.cs" />
     <Compile Include="Models\TeslaVehicle.cs" />
+    <Compile Include="TeslaPath.cs" />
     <Compile Include="TeslaWebClient.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TeslaLib.Models;
 using TeslaLib.Streaming;
+using static TeslaLib.TeslaPath;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable EmptyGeneralCatchClause
@@ -22,202 +23,6 @@ namespace TeslaLib
 {
     public class TeslaClient : IDisposable
     {
-        #region API Paths
-
-        public string TESLA_STREAMING_SERVER
-        {
-            get
-            {
-                return "https://streaming.vn.teslamotors.com/";
-            }
-        }
-
-        public string TESLA_SERVER
-        {
-            get
-            {
-                return IsDebugMode ? "https://private-857c-timdorr.apiary.io/" : "https://portal.vn.teslamotors.com/";
-            }
-        }
-
-        public string LOGIN_PATH
-        {
-            get
-            {
-                return "login";
-            }
-        }
-
-        public string VEHICLES_PATH
-        {
-            get
-            {
-                return "vehicles";
-            }
-        }
-
-        public string MOBILE_ENABLED_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/mobile_enabled";
-            }
-        }
-
-        public string CHARGE_STATE_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/charge_state";
-            }
-        }
-
-        public string CLIMATE_STATE_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/climate_state";
-            }
-        }
-
-        public string DRIVE_STATE_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/drive_state";
-            }
-        }
-
-        public string GUI_SETTINGS_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/gui_settings";
-            }
-        }
-
-        public string VEHICLE_STATE_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/vehicle_state";
-            }
-        }
-
-        public string WAKE_UP_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/wake_up";
-            }
-        }
-
-        public string CHARGE_PORT_DOOR_OPEN_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/charge_port_door_open";
-            }
-        }
-
-        public string SET_CHARGE_LIMIT
-        {
-            get
-            {
-                return "vehicles/{0}/command/set_charge_limit?percent={1}";
-            }
-        }
-
-        public string CHARGE_START_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/charge_start";
-            }
-        }
-
-        public string CHARGE_STOP_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/charge_stop";
-            }
-        }
-
-        public string FLASH_LIGHTS_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/flash_lights";
-            }
-        }
-
-        public string HONK_HORN_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/honk_horn";
-            }
-        }
-
-        public string DOOR_UNLOCK_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/door_unlock";
-            }
-        }
-
-        public string DOOR_LOCK_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/door_lock";
-            }
-        }
-
-        public string SET_TEMPERATURE_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/set_temps?driver_temp={1}&passenger_temp={2}";
-            }
-        }
-
-        public string HVAC_START_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/auto_conditioning_start";
-            }
-        }
-
-        public string HVAC_STOP_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/auto_conditioning_stop";
-            }
-        }
-
-        public string SUN_ROOF_CONTROL_PATH_WITH_PERCENT
-        {
-            get
-            {
-                return "vehicles/{0}/command/sun_roof_control?state={1}&percent={2}";
-            }
-        }
-
-        public string SUN_ROOF_CONTROL_PATH
-        {
-            get
-            {
-                return "vehicles/{0}/command/sun_roof_control?state={1}";
-            }
-        }
-
-        #endregion
-
         public bool IsDebugMode { get; private set; }
 
         public bool IsLoggedIn { get; private set; }
@@ -402,7 +207,7 @@ namespace TeslaLib
                  };
 
                 // Perform the POST request.
-                var data = webClient.UploadValues(Path.Combine(TESLA_SERVER, LOGIN_PATH), values);
+                var data = webClient.UploadValues(Path.Combine(TESLA_SERVER(IsDebugMode), LOGIN_PATH), values);
 
                 var response = Encoding.ASCII.GetString(data);
 
@@ -432,7 +237,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, VEHICLES_PATH));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), VEHICLES_PATH));
 
                 var vehicles = ParseVehicles(response);
 
@@ -455,7 +260,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(MOBILE_ENABLED_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(MOBILE_ENABLED_PATH, vehicle.Id)));
 
                 var status = ParseMobileEnabledStatus(response);
 
@@ -476,7 +281,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STATE_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(CHARGE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
@@ -499,7 +304,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CLIMATE_STATE_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(CLIMATE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
@@ -522,7 +327,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(DRIVE_STATE_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(DRIVE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
@@ -545,7 +350,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(GUI_SETTINGS_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(GUI_SETTINGS_PATH, vehicle.Id)));
 
                 var status = ParseGuiStateStatus(response);
 
@@ -566,7 +371,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(VEHICLE_STATE_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(VEHICLE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
@@ -589,7 +394,7 @@ namespace TeslaLib
 
             try
             {
-                webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(WAKE_UP_PATH, vehicle.Id)));
+                webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(WAKE_UP_PATH, vehicle.Id)));
             }
             catch (Exception)
             {
@@ -604,7 +409,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CHARGE_PORT_DOOR_OPEN_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(CHARGE_PORT_DOOR_OPEN_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -628,7 +433,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(SET_CHARGE_LIMIT, vehicle.Id, percent)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(SET_CHARGE_LIMIT, vehicle.Id, percent)));
 
                 var result = ParseResultStatus(response);
 
@@ -649,7 +454,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STATE_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(CHARGE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
@@ -672,7 +477,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STOP_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(CHARGE_STOP_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
@@ -695,7 +500,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(FLASH_LIGHTS_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(FLASH_LIGHTS_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -716,7 +521,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(HONK_HORN_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(HONK_HORN_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -737,7 +542,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(DOOR_UNLOCK_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(DOOR_UNLOCK_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -758,7 +563,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(DOOR_LOCK_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(DOOR_LOCK_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -788,7 +593,7 @@ namespace TeslaLib
                 passengerTemp = Math.Max(passengerTemp, TEMP_MIN);
                 passengerTemp = Math.Min(passengerTemp, TEMP_MAX);
 
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(SET_TEMPERATURE_PATH, vehicle.Id, driverTemp, passengerTemp)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(SET_TEMPERATURE_PATH, vehicle.Id, driverTemp, passengerTemp)));
 
                 var result = ParseResultStatus(response);
 
@@ -809,7 +614,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(HVAC_START_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(HVAC_START_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -830,7 +635,7 @@ namespace TeslaLib
 
             try
             {
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(HVAC_STOP_PATH, vehicle.Id)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(HVAC_STOP_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -860,11 +665,11 @@ namespace TeslaLib
 
                 if (roofState == PanoramicRoofState.MOVE)
                 {
-                    response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(SUN_ROOF_CONTROL_PATH_WITH_PERCENT, vehicle.Id, roofState.GetEnumValue(), percentOpen)));
+                    response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(SUN_ROOF_CONTROL_PATH_WITH_PERCENT, vehicle.Id, roofState.GetEnumValue(), percentOpen)));
                 }
                 else
                 {
-                    response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format(SUN_ROOF_CONTROL_PATH, vehicle.Id, roofState.GetEnumValue())));
+                    response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(SUN_ROOF_CONTROL_PATH, vehicle.Id, roofState.GetEnumValue())));
                 }
 
                 var result = ParseResultStatus(response);
@@ -895,7 +700,7 @@ namespace TeslaLib
             {
                 values = "speed,odometer,soc,elevation,est_heading,est_lat,est_lng,power,shift_state,range,est_range";
 
-                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER, string.Format("stream/{0}/?values={1}", vehicle.VehicleId, values)));
+                var response = webClient.DownloadString(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format("stream/{0}/?values={1}", vehicle.VehicleId, values)));
 
                 return response;
             }
@@ -923,7 +728,7 @@ namespace TeslaLib
                  };
 
                 // Perform the POST request.
-                var data = await webClient.UploadValuesTaskAsync(Path.Combine(TESLA_SERVER, LOGIN_PATH), values);
+                var data = await webClient.UploadValuesTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), LOGIN_PATH), values);
 
                 var response = Encoding.ASCII.GetString(data);
 
@@ -953,7 +758,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, VEHICLES_PATH));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), VEHICLES_PATH));
 
                 var vehicles = ParseVehicles(response);
 
@@ -974,7 +779,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(MOBILE_ENABLED_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(MOBILE_ENABLED_PATH, vehicle.Id)));
 
                 var status = ParseMobileEnabledStatus(response);
 
@@ -995,7 +800,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STATE_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(CHARGE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
@@ -1018,7 +823,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CLIMATE_STATE_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(CLIMATE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
@@ -1041,7 +846,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(DRIVE_STATE_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(DRIVE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
@@ -1064,7 +869,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(GUI_SETTINGS_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(GUI_SETTINGS_PATH, vehicle.Id)));
 
                 var status = ParseGuiStateStatus(response);
 
@@ -1085,7 +890,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(VEHICLE_STATE_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(VEHICLE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
@@ -1108,7 +913,7 @@ namespace TeslaLib
 
             try
             {
-                await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(WAKE_UP_PATH, vehicle.Id)));
+                await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(WAKE_UP_PATH, vehicle.Id)));
             }
             catch (Exception)
             {
@@ -1123,7 +928,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CHARGE_PORT_DOOR_OPEN_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(CHARGE_PORT_DOOR_OPEN_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -1148,7 +953,7 @@ namespace TeslaLib
             try
             {
                 // TODO: Check for v4.5
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(SET_CHARGE_LIMIT, vehicle.Id, percent)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(SET_CHARGE_LIMIT, vehicle.Id, percent)));
 
                 var result = ParseResultStatus(response);
 
@@ -1169,7 +974,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STATE_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(CHARGE_STATE_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
@@ -1192,7 +997,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(CHARGE_STOP_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(CHARGE_STOP_PATH, vehicle.Id)));
 
                 response = RemoveComments(response);
 
@@ -1215,7 +1020,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(FLASH_LIGHTS_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(FLASH_LIGHTS_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -1236,7 +1041,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(HONK_HORN_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(HONK_HORN_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -1257,7 +1062,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(DOOR_UNLOCK_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(DOOR_UNLOCK_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -1278,7 +1083,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(DOOR_LOCK_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(DOOR_LOCK_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -1308,7 +1113,7 @@ namespace TeslaLib
                 passengerTemp = Math.Max(passengerTemp, TEMP_MIN);
                 passengerTemp = Math.Min(passengerTemp, TEMP_MAX);
 
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(SET_TEMPERATURE_PATH, vehicle.Id, driverTemp, passengerTemp)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(SET_TEMPERATURE_PATH, vehicle.Id, driverTemp, passengerTemp)));
 
                 var result = ParseResultStatus(response);
 
@@ -1329,7 +1134,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(HVAC_START_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(HVAC_START_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -1350,7 +1155,7 @@ namespace TeslaLib
 
             try
             {
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(HVAC_STOP_PATH, vehicle.Id)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(HVAC_STOP_PATH, vehicle.Id)));
 
                 var result = ParseResultStatus(response);
 
@@ -1380,11 +1185,11 @@ namespace TeslaLib
 
                 if (roofState == PanoramicRoofState.MOVE)
                 {
-                    response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(SUN_ROOF_CONTROL_PATH_WITH_PERCENT, vehicle.Id, roofState.GetEnumValue(), percentOpen)));
+                    response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(SUN_ROOF_CONTROL_PATH_WITH_PERCENT, vehicle.Id, roofState.GetEnumValue(), percentOpen)));
                 }
                 else
                 {
-                    response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format(SUN_ROOF_CONTROL_PATH, vehicle.Id, roofState.GetEnumValue())));
+                    response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format(SUN_ROOF_CONTROL_PATH, vehicle.Id, roofState.GetEnumValue())));
                 }
 
                 var result = ParseResultStatus(response);
@@ -1414,7 +1219,7 @@ namespace TeslaLib
             {
                 values = "speed,odometer,soc,elevation,est_heading,est_lat,est_lng,power,shift_state,range,est_range";
 
-                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER, string.Format("stream/{0}/?values={1}", vehicle.VehicleId, values)));
+                var response = await webClient.DownloadStringTaskAsync(Path.Combine(TESLA_SERVER(IsDebugMode), string.Format("stream/{0}/?values={1}", vehicle.VehicleId, values)));
 
                 //ResultStatus result = ParseResultStatus(response);
 
@@ -1540,7 +1345,7 @@ namespace TeslaLib
 
             while (!isStopStreaming)
             {
-                var request = WebRequest.CreateHttp(new Uri(Path.Combine(TESLA_STREAMING_SERVER, "stream", vehicle.VehicleId.ToString(CultureInfo.InvariantCulture), "?values=" + valuesToStream)));
+                var request = WebRequest.CreateHttp(new Uri(Path.Combine(TeslaPath.TESLA_STREAMING_SERVER, "stream", vehicle.VehicleId.ToString(CultureInfo.InvariantCulture), "?values=" + valuesToStream)));
                 request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(strBasicAuthInfo));
                 request.Timeout = 12500; // a bit more than the expected 2 minute max long poll
 

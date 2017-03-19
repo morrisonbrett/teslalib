@@ -27,13 +27,13 @@ namespace FieldAnalyzer
                 var car = cars.FirstOrDefault();
 
                 const bool showUnchanged = true;
-                WriteModifiedFields(await client.AnalyzeFieldsAsync<TeslaVehicle>(client.TESLA_SERVER, client.VEHICLES_PATH), showUnchanged);
-                WriteModifiedFields(await client.AnalyzeFieldsAsync<ChargeStateStatus>(client.TESLA_SERVER, string.Format(client.CHARGE_STATE_PATH, car.Id)), showUnchanged);
-                WriteModifiedFields(await client.AnalyzeFieldsAsync<ClimateStateStatus>(client.TESLA_SERVER, string.Format(client.CLIMATE_STATE_PATH, car.Id)), showUnchanged);
-                WriteModifiedFields(await client.AnalyzeFieldsAsync<DriveStateStatus>(client.TESLA_SERVER, string.Format(client.DRIVE_STATE_PATH, car.Id)), showUnchanged);
-                WriteModifiedFields(await client.AnalyzeFieldsAsync<GuiSettingsStatus>(client.TESLA_SERVER, string.Format(client.GUI_SETTINGS_PATH, car.Id)), showUnchanged);
-                WriteModifiedFields(await client.AnalyzeFieldsAsync<MobileEnabledStatus>(client.TESLA_SERVER, string.Format(client.MOBILE_ENABLED_PATH, car.Id)), showUnchanged);
-                WriteModifiedFields(await client.AnalyzeFieldsAsync<VehicleStateStatus>(client.TESLA_SERVER, string.Format(client.VEHICLE_STATE_PATH, car.Id)), showUnchanged);
+                WriteModifiedFields(await client.AnalyzeFieldsAsync<TeslaVehicle>(TeslaPath.TESLA_SERVER(client.IsDebugMode), TeslaPath.VEHICLES_PATH), showUnchanged);
+                WriteModifiedFields(await client.AnalyzeFieldsAsync<ChargeStateStatus>(TeslaPath.TESLA_SERVER(client.IsDebugMode), string.Format(TeslaPath.CHARGE_STATE_PATH, car.Id)), showUnchanged);
+                WriteModifiedFields(await client.AnalyzeFieldsAsync<ClimateStateStatus>(TeslaPath.TESLA_SERVER(client.IsDebugMode), string.Format(TeslaPath.CLIMATE_STATE_PATH, car.Id)), showUnchanged);
+                WriteModifiedFields(await client.AnalyzeFieldsAsync<DriveStateStatus>(TeslaPath.TESLA_SERVER(client.IsDebugMode), string.Format(TeslaPath.DRIVE_STATE_PATH, car.Id)), showUnchanged);
+                WriteModifiedFields(await client.AnalyzeFieldsAsync<GuiSettingsStatus>(TeslaPath.TESLA_SERVER(client.IsDebugMode), string.Format(TeslaPath.GUI_SETTINGS_PATH, car.Id)), showUnchanged);
+                WriteModifiedFields(await client.AnalyzeFieldsAsync<MobileEnabledStatus>(TeslaPath.TESLA_SERVER(client.IsDebugMode), string.Format(TeslaPath.MOBILE_ENABLED_PATH, car.Id)), showUnchanged);
+                WriteModifiedFields(await client.AnalyzeFieldsAsync<VehicleStateStatus>(TeslaPath.TESLA_SERVER(client.IsDebugMode), string.Format(TeslaPath.VEHICLE_STATE_PATH, car.Id)), showUnchanged);
             }
 
         }
